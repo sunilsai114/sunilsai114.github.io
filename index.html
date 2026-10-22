@@ -70,7 +70,7 @@
   nav li a:hover{ color:var(--paper); }
 
   /* HERO */
-  #hero{ min-height:100vh; padding:120px 0 60px; display:flex; align-items:center; overflow:hidden; }
+  #hero{ position:relative; min-height:100vh; padding:120px 0 60px; display:flex; align-items:center; overflow:hidden; }
   #sim{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
   #hero::after{
     content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
@@ -244,9 +244,15 @@
     section{ padding:80px 0; }
     .loop, .grid4{ grid-template-columns:1fr; }
     nav li:nth-child(n+4){ display:none; }
-    #hero{ padding-bottom:330px; }
+    #hero{ min-height:100vh; min-height:100svh; padding:92px 0 270px; }
+    .status{ font-size:11px; padding:6px 10px; margin-bottom:18px; }
+    h1{ font-size:40px; }
+    .sub{ font-size:16px; margin-top:16px; }
+    .cta{ margin-top:22px; gap:10px; flex-wrap:nowrap; }
+    .btn{ padding:12px 16px; font-size:15px; white-space:nowrap; }
     .hud{ display:none; }
-    #hero::after{ background:linear-gradient(0deg, rgba(10,10,10,0) 0%, rgba(10,10,10,.55) 45%, rgba(10,10,10,.85) 75%); }
+    #hero::after{ display:none; }
+    #sim{ inset:auto 0 0 0; -webkit-mask-image:linear-gradient(180deg, transparent 0, #000 22%); mask-image:linear-gradient(180deg, transparent 0, #000 22%); }
   }
   @media (prefers-reduced-motion:reduce){
     html{ scroll-behavior:auto; } .rv{ opacity:1; transform:none; transition:none; } .brand i{ animation:none; }
@@ -654,15 +660,15 @@
   /* ----- loop ----- */
   var scroll = 0, sweep = 0, tx = 0, yaw = 0, last = 0, visible = true, mx = 0, my = 0, SPEED = 7;
   function layout(){
-    var W = hero.clientWidth, H = hero.clientHeight;
+    var W = hero.clientWidth, H = W <= 600 ? 400 : hero.clientHeight;
     renderer.setSize(W, H, true);
     camera.aspect = W / H; camera.updateProjectionMatrix();
   }
   function setCam(){
-    var narrow = hero.clientWidth < 900;
-    var cx = narrow ? 3 : 4, cy = narrow ? 10 : 9.5, cz = narrow ? 24 : 18;
+    var W = hero.clientWidth, phone = W <= 600, narrow = W < 900;
+    var cx = phone ? 5 : narrow ? 3 : 4, cy = phone ? 7.5 : narrow ? 10 : 9.5, cz = phone ? 20 : narrow ? 24 : 18;
     camera.position.set(cx + mx * 1.5, cy - my * .8, cz);
-    camera.lookAt(narrow ? -0.5 : -10.5, narrow ? 10 : 0.5, -8);
+    if(phone) camera.lookAt(-0.8, 0.8, -5); else camera.lookAt(narrow ? -0.5 : -10.5, narrow ? 10 : 0.5, -8);
   }
   function step(dt){
     if(!reduce){ scroll += SPEED * dt; sweep += 1.25 * dt; }
@@ -720,6 +726,7 @@
   }
   window.addEventListener('mousemove', function(e){ mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
   window.addEventListener('resize', layout);
+  if('ResizeObserver' in window) new ResizeObserver(layout).observe(hero);
   if('IntersectionObserver' in window) new IntersectionObserver(function(e){ visible = e[0].isIntersecting; }).observe(hero);
   layout();
   if(reduce){ step(0.016); setCam(); renderer.render(scene, camera); }
