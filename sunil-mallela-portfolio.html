@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'" />
 <meta name="referrer" content="strict-origin-when-cross-origin" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sunil Mallela | AI Engineer, Autonomous Systems</title>
@@ -584,7 +584,7 @@
 <div class="hazard" aria-hidden="true"></div>
 <footer><div class="wrap"><span>© 2026 Sunil Mallela</span><span>SENSE · PLAN · ACT</span></div></footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="vendor/three.min.js"></script>
 <script>
 
 
@@ -808,9 +808,10 @@ function sim2D(){
 
   function resize(){
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = hero.clientWidth; H = hero.clientHeight;
+    W = hero.clientWidth; H = W <= 600 ? 400 : hero.clientHeight;
+    c.style.width = W + 'px'; c.style.height = H + 'px';
     c.width = W*dpr; c.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
-    vx = W * (W < 700 ? 0.22 : 0.34); vy = H*0.55;
+    vx = W * (W < 700 ? 0.3 : 0.34); vy = H*(W <= 600 ? 0.5 : 0.55);
     seed();
   }
   function seed(){
@@ -912,6 +913,7 @@ function sim2D(){
     new IntersectionObserver(function(e){ visible = e[0].isIntersecting; }).observe(hero);
   }
   window.addEventListener('resize', resize);
+  if('ResizeObserver' in window) new ResizeObserver(resize).observe(hero);
   resize();
   if(reduce){ frame(0); visible = false; } else { requestAnimationFrame(frame); }
 }
